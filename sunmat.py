@@ -1,4 +1,6 @@
-import numpy as np
+#import numpy as np
+
+import autograd.numpy as np
 
 class lie_component():
     """
@@ -201,6 +203,25 @@ def sun_blockdiag(x, N, o = 0):
     for i in np.arange(x.size):
         ret[(2*i):2*(i+1),(2*i):2*(i+1)] = get_su2(x[i])
     return np.roll(ret, (o,o), axis = (0,1))
+
+def full_suN(n):
+    c = 0
+    U = lie_eye(n)
+    X = []
+    for i in np.arange(n):
+        for j in np.arange(i+1,n):
+            Um = lie_eye(n)
+            x = "x[%i]" % c
+            X.append(x)
+            m = get_su2(x)
+            Um[i,i] = m[0,0]
+            Um[j,j] = m[1,1]
+            Um[i,j] = m[0,1]
+            Um[j,i] = m[1,0]
+            c += 1
+            U = np.dot(U, Um)
+            lie_shed_zeros(U)
+    return c, eval(array2lambda(X, U))
 
 def suN(n):
     """
